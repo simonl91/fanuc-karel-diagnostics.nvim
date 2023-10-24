@@ -1,42 +1,25 @@
 local ns = vim.api.nvim_create_namespace('fanuc-karel-diagnostics')
 
-local function flatten(arr)
-    local results = {}
-    local function arrFlatten(arr)
-        for _, v in ipairs(arr) do
-            if type(v) == "table" then
-                arrFlatten(v)
-            else
-                results[#results+1] = v
-            end
-        end
-    end
-    arrFlatten(arr)
-    return results
-end
+local jobId = 0
 
-function run_ktrans(karelfile)
-    local message = {}
-    local append_data = function(_, data)
-        table.insert(message,data)
+function run_ktrans(karelfile, on_complete)
+
+    -- Stop ongoing job
+    local running = vim.fn.jobwait({jobId}, 0)[1] == -1
+    if running then
+        local res = vim.fn.jobstop(jobId)
     end
-    local job = vim.fn.jobstart(
+
+    jobId = vim.fn.jobstart(
         'ktrans ' .. karelfile,
         {
-            on_stdout = append_data,
-            on_stderr = append_data,
+            stdout_buffered = true,
+            on_stdout =
+                function (_,d)
+                    on_complete(d)
+                end
         }
     )
-    vim.fn.jobwait({job})
-    message = flatten(message)
-    local removeEmpty = {}
-    for _, v in ipairs(message) do
-        if v == "" then
-        else
-            table.insert(removeEmpty, v)
-        end
-    end
-    return removeEmpty
 end
 
 function parse_result(result)
@@ -63,11 +46,12 @@ end
 function Callback_fn()
     -- Run ktrans
     local bufname = vim.api.nvim_buf_get_name(0)
-    local result = run_ktrans(bufname)
-    -- Parse output
-    local diag = parse_result(result)
-    -- report diagnostics
-    vim.diagnostic.set(ns, 0, diag, nil)
+    run_ktrans(bufname, function(d)
+        -- Parse output
+        local diag = parse_result(d)
+        -- report diagnostics
+        vim.diagnostic.set(ns, 0, diag, nil)
+    end)
 end
 
 vim.api.nvim_create_autocmd("BufWritePost", {

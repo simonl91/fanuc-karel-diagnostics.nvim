@@ -9,7 +9,7 @@ function run_ktrans(karelfile, on_complete)
         local res = vim.fn.jobstop(jobId)
     end
 
-    local cmd = 'ktrans "' .. karelfile .. '" "' .. os.tmpname() .. '.pc"'
+    local cmd = 'ktrans "' .. karelfile
     print(cmd)
     jobId = vim.fn.jobstart(
         cmd,
@@ -48,6 +48,7 @@ function Callback_fn()
     -- Run ktrans
     local bufname = vim.api.nvim_buf_get_name(0)
     run_ktrans(bufname, function(d)
+        os.remove(string.gsub(bufname, ".kl", ".pc"))
         -- Parse output
         local diag = parse_result(d)
         -- report diagnostics

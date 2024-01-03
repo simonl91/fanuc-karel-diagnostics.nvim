@@ -9,8 +9,10 @@ function run_ktrans(karelfile, on_complete)
         local res = vim.fn.jobstop(jobId)
     end
 
+    local cmd = 'ktrans "' .. karelfile .. '" "' .. os.tmpname() .. '.pc"'
+    print(cmd)
     jobId = vim.fn.jobstart(
-        'ktrans "' .. karelfile .. '" "' .. os.tmpname() .. '"',
+        cmd,
         {
             stdout_buffered = true,
             on_stdout =

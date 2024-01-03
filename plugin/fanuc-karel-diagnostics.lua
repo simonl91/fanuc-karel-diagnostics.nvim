@@ -3,19 +3,18 @@ local ns = vim.api.nvim_create_namespace('fanuc-karel-diagnostics')
 local jobId = 0
 
 function run_ktrans(karelfile, on_complete)
-
     -- Stop ongoing job
-    local running = vim.fn.jobwait({jobId}, 0)[1] == -1
+    local running = vim.fn.jobwait({ jobId }, 0)[1] == -1
     if running then
         local res = vim.fn.jobstop(jobId)
     end
 
     jobId = vim.fn.jobstart(
-        'ktrans ' .. karelfile,
+        'ktrans ' .. karelfile .. ' ' .. os.tmpname(),
         {
             stdout_buffered = true,
             on_stdout =
-                function (_,d)
+                function(_, d)
                     on_complete(d)
                 end
         }
@@ -25,18 +24,18 @@ end
 function parse_result(result)
     local diag = {}
     for i, v in ipairs(result) do
-        local lineStr, _ = string.match(v,"^%s*(%d+).+$")
+        local lineStr, _ = string.match(v, "^%s*(%d+).+$")
         if lineStr == nil then goto continue end -- not a match
         local line = tonumber(lineStr)
-        local colStr = result[i+1]
+        local colStr = result[i + 1]
         local s, _ = string.find(colStr, '%^')
-        local col = tonumber(s)-6
-        local msg = result[i+2]
+        local col = tonumber(s) - 6
+        local msg = result[i + 2]
         table.insert(diag, {
             lnum = line - 1,
-            col =  col,
+            col = col,
             message = msg,
-            severtiy =  vim.diagnostic.severity.E,
+            severtiy = vim.diagnostic.severity.E,
         })
         ::continue::
     end
@@ -56,7 +55,6 @@ end
 
 vim.api.nvim_create_autocmd("BufWritePost", {
     pattern = "*.kl",
-    group = vim.api.nvim_create_augroup("FanucKarelDiagnostics", {clear = true}),
+    group = vim.api.nvim_create_augroup("FanucKarelDiagnostics", { clear = true }),
     callback = Callback_fn,
 })
-

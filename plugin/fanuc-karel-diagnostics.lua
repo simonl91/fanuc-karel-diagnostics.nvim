@@ -10,7 +10,6 @@ function run_ktrans(karelfile, on_complete)
     end
 
     local cmd = 'ktrans "' .. karelfile
-    print(cmd)
     jobId = vim.fn.jobstart(
         cmd,
         {

@@ -46,22 +46,19 @@ end
 function Callback_fn()
     -- Run ktrans
     local bufname = vim.api.nvim_buf_get_name(0)
-    -- skip header files
     if string.find(bufname, ".th.kl") then
         do return end
     end
     if string.find(bufname, ".h.kl") then
         do return end
     end
-
-    string.
-        run_ktrans(bufname, function(d)
-            os.remove(string.gsub(bufname, ".kl", ".pc"))
-            -- Parse output
-            local diag = parse_result(d)
-            -- report diagnostics
-            vim.diagnostic.set(ns, 0, diag, nil)
-        end)
+    run_ktrans(bufname, function(d)
+        os.remove(string.gsub(bufname, ".kl", ".pc"))
+        -- Parse output
+        local diag = parse_result(d)
+        -- report diagnostics
+        vim.diagnostic.set(ns, 0, diag, nil)
+    end)
 end
 
 vim.api.nvim_create_autocmd("BufWritePost", {

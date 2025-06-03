@@ -14,8 +14,7 @@ On every save your .kl files are compiled with ktrans, compile errors are then s
 {
   'simonl91/fanuc-karel-diagnostics.nvim',
   opts = {
-    ktrans_cwd = nil, -- Optional: Set the working directory for ktrans
-    ktrans_args = {}  -- Optional: Additional arguments for ktrans 
+    ktrans_args = {}  -- Optional: Additional arguments for ktrans ex: {'/config', 'robot1/robot.ini'}
   }
 }
 ```

@@ -16,17 +16,13 @@ function run_ktrans(karelfile, on_complete)
 	end
 
 	local cmd = { "ktrans", karelfile }
-
-	-- extend table with args from config.options
-	cmd = vim.list_extend(cmd, config.options.ktrans_args or {})
+	cmd = vim.list_extend(cmd, config.options.ktrans_args or {}) -- extend table with args from config.options.ktrans_args
 
 	jobId = vim.fn.jobstart(cmd, {
-		cwd = config.options.ktrans_cwd,
 		stdout_buffered = true,
 		on_stdout = function(_, d)
 			on_complete(d)
 		end,
-
 	})
 end
 
@@ -55,7 +51,7 @@ end
 
 -- Run ktrans on save
 function Callback_fn()
-	-- Get full path of the current file
+	-- Get full path of the current file opened in the current buffer
 	local bufname = vim.api.nvim_buf_get_name(0)
 
 	-- Skip files that are includes, and not compilable by them selves
@@ -73,10 +69,7 @@ function Callback_fn()
 	end
 
 	run_ktrans(bufname, function(d)
-		-- Check if config cwd is nil
-		if config.options.ktrans_cwd ~= nil then
-			bufname = vim.fs.joinpath(config.options.ktrans_cwd, vim.fs.basename(bufname))
-		end
+		bufname = vim.fs.joinpath(vim.fn.getcwd(), vim.fs.basename(bufname))
 		os.remove(string.gsub(bufname, ".kl", ".pc"))
 		-- Parse output
 		local diag = parse_result(d)

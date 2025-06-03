@@ -1,7 +1,6 @@
 local M = {}
 
 local defaults = {
-	ktrans_cwd = nil,
 	ktrans_args = {},
 }
 

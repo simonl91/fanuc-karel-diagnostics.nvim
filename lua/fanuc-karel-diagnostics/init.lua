@@ -20,32 +20,17 @@ function run_ktrans(karelfile, on_complete)
 	-- extend table with args from config.options
 	cmd = vim.list_extend(cmd, config.options.ktrans_args or {})
 
-	print("Running command: " .. table.concat(cmd, " "))
 	jobId = vim.fn.jobstart(cmd, {
 		cwd = config.options.ktrans_cwd,
 		stdout_buffered = true,
-		stderr_buffered = true,
 		on_stdout = function(_, d)
 			on_complete(d)
 		end,
-		on_stderr = function(_, d)
-			-- Print stderr output to the command line
-			print_lines(d)
-		end,
+
 	})
 end
 
-function print_lines(data)
-	for _, line in ipairs(data) do
-		if line and line ~= "" then
-			print(line)
-		end
-	end
-end
-
 function parse_result(result)
-	-- print lua table
-	print_lines(result)
 	local diag = {}
 	for i, v in ipairs(result) do
 		local lineStr, _ = string.match(v, "^%s*(%d+).+$")
@@ -92,10 +77,7 @@ function Callback_fn()
 		if config.options.ktrans_cwd ~= nil then
 			bufname = vim.fs.joinpath(config.options.ktrans_cwd, vim.fs.basename(bufname))
 		end
-		print("Removing: " .. bufname)
-
-		local success = os.remove(string.gsub(bufname, ".kl", ".pc"))
-		print("Removed: " .. tostring(success))
+		os.remove(string.gsub(bufname, ".kl", ".pc"))
 		-- Parse output
 		local diag = parse_result(d)
 		-- report diagnostics

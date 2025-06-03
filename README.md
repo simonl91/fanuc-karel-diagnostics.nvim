@@ -4,10 +4,21 @@ On every save your .kl files are compiled with ktrans, compile errors are then s
 
 
 ## Requirements
-* Fanuc Roboguide
+* Fanuc Roboguide must be installed
 
 ## Installation
 * [Add ktrans to path](#add-to-path)
+
+### Lazy package manager
+```lua
+{
+  'simonl91/fanuc-karel-diagnostics.nvim',
+  opts = {
+    ktrans_cwd = nil, -- Optional: Set the working directory for ktrans
+    ktrans_args = {}  -- Optional: Additional arguments for ktrans 
+  }
+}
+```
 
 
 ### Example

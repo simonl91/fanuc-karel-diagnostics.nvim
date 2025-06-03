@@ -74,7 +74,7 @@ function Callback_fn()
 		-- Parse output
 		local diag = parse_result(d)
 		-- report diagnostics
-		vim.diagnostic.set(ns, 0, diag, nil)
+		vim.diagnostic.set(ns, 0, diag, { virtual_text = config.options.virtual_text })
 	end)
 end
 

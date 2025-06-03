@@ -2,6 +2,7 @@ local M = {}
 
 local defaults = {
 	ktrans_args = {},
+	virtual_text = true,
 }
 
 M.options = nil
